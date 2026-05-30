@@ -78,5 +78,8 @@ yarn-error.log
 app-release.apk
 *.apk
 *.aab
-# Uncomment the line below if you are making this repo public to keep firebase config private:
-# android/app/google-services.json
+google-services.json
+android/google-services.json
+.env
+*.jks
+*.keystore
