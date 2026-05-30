@@ -10,20 +10,25 @@ try {
 
 /**
  * Triggers light tactile/haptic feedback for button presses.
+ * Defer call with setTimeout to prevent blocking the JS/render thread on fast clicks.
  */
 export const triggerButtonHaptic = () => {
-  if (ReactNativeHapticFeedback) {
-    const options = {
-      enableVibrateFallback: true,
-      ignoreAndroidSystemSettings: false,
-    };
-    ReactNativeHapticFeedback.trigger('impactLight', options);
-  } else {
-    // Fallback to core Vibration API
-    if (Platform.OS === 'android') {
-      Vibration.vibrate(12); // Short pulse in milliseconds
-    } else {
-      Vibration.vibrate(); // iOS vibration fallback
+  setTimeout(() => {
+    try {
+      if (ReactNativeHapticFeedback) {
+        const options = {
+          enableVibrateFallback: false, // Turn off fallback to heavy vibrations
+          ignoreAndroidSystemSettings: false,
+        };
+        ReactNativeHapticFeedback.trigger('impactLight', options);
+      } else {
+        // Fallback to core Vibration API (Android only - iOS fallback is too heavy/slow)
+        if (Platform.OS === 'android') {
+          Vibration.vibrate(10); // Very short pulse
+        }
+      }
+    } catch (e) {
+      // Catch any unexpected haptic module failures silently
     }
-  }
+  }, 0);
 };

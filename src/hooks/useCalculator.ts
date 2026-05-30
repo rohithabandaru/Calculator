@@ -44,6 +44,12 @@ export const useCalculator = (): UseCalculatorReturn => {
   // Live preview: evaluate partial expression as user types
   useEffect(() => {
     if (expression.length > 0 && !justEvaluated) {
+      // If it's just a simple number, the preview is the number itself.
+      // This bypasses expensive mathjs parsing for basic typing.
+      if (/^-?\d*\.?\d*$/.test(expression)) {
+        setResult(expression);
+        return;
+      }
       const preview = evaluateExpression(expression, useDegrees);
       if (preview !== 'Error') {
         setResult(preview);

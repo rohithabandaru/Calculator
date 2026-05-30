@@ -88,9 +88,9 @@ export default function EditProfile({ user, isDarkMode, toggleTheme, onClose, on
     launchImageLibrary(
       {
         mediaType: 'photo',
-        maxWidth: 1000,
-        maxHeight: 1000,
-        quality: 0.8,
+        maxWidth: 400,
+        maxHeight: 400,
+        quality: 0.7,
         includeBase64: true,
       },
       async (response) => {
@@ -101,19 +101,6 @@ export default function EditProfile({ user, isDarkMode, toggleTheme, onClose, on
           Alert.alert('Error', 'Unable to select photo.');
         } else if (response.assets && response.assets.length > 0) {
           const asset = response.assets[0];
-          
-          // Check size: 1-600 KB succeeds, > 600 KB fails.
-          // Base64 size estimation or direct asset.fileSize check
-          const fileSizeInBytes = asset.fileSize || (asset.base64 ? (asset.base64.length * 3) / 4 : 0);
-          const fileSizeInKB = Math.round(fileSizeInBytes / 1024);
-
-          if (fileSizeInBytes > 600 * 1024) {
-            Alert.alert(
-              'Upload Failed',
-              `Selected photo is ${fileSizeInKB} KB. Please select a photo between 1 KB and 600 KB.`
-            );
-            return;
-          }
 
           if (asset.base64) {
             setIsUploading(true);
@@ -212,14 +199,7 @@ export default function EditProfile({ user, isDarkMode, toggleTheme, onClose, on
       ]);
     } catch (err: any) {
       console.log('Error updating profile:', err);
-      
-      // If a base64 photo is set, the error is almost certainly a size issue
-      if (photoURL && photoURL.startsWith('data:')) {
-        const sizeInKB = Math.round((photoURL.length * 3) / 4 / 1024);
-        Alert.alert('Image Too Large', `Selected photo is ${sizeInKB} KB. Max allowed is 600 KB. Please select a smaller photo.`);
-      } else {
-        Alert.alert('Error', 'Something went wrong. Try again.');
-      }
+      Alert.alert('Error', 'Something went wrong. Try again.');
     } finally {
       setIsSaving(false);
     }
